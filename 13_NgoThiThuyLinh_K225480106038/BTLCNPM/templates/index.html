@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Vé Tàu Online</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">🚆 Đặt Vé Tàu Online</div>
+    <nav class="nav">
+        <a href="#" onclick="showBooking()">Trang chủ</a>
+        <a href="#" onclick="showBooking()">Đặt vé</a>
+        <a href="#" onclick="showHistory()">Lịch sử</a>
+        <a href="/logout">Đăng xuất</a>
+    </nav>
+</header>
+
+<section class="banner">
+    <div class="banner-text">
+        <h1>Hệ thống đặt vé tàu nhanh chóng & tiện lợi</h1>
+        <p>Chọn tuyến – Chọn chuyến – Nhận vé ngay!</p>
+        <button onclick="scrollToForm()">Đặt vé ngay</button>
+    </div>
+</section>
+
+<!-- HIỂN THỊ THÔNG BÁO FLASH -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- PHẦN ĐẶT VÉ -->
+<section class="booking-section" id="bookingSection">
+    <h2>Thông tin đặt vé</h2>
+
+    <form class="booking-form" action="/datve" method="POST">
+        <div class="form-group">
+            <label>Tuyến đường</label>
+            <select id="selectTuyen" name="tuyen_duong" required>
+                <option value="">-- Đang tải dữ liệu... --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Chuyến tàu</label>
+            <select id="selectLichTrinh" name="ma_lich_trinh" required>
+                <option value="">-- Chọn tuyến trước --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Giá vé</label>
+            <input type="text" id="giaVe" name="gia" readonly placeholder="Hãy chọn chuyến...">
+        </div>
+
+        <button class="submit-btn" type="submit">Xác nhận đặt vé</button>
+    </form>
+</section>
+
+<!-- PHẦN LỊCH SỬ -->
+<section class="history-section hidden" id="historySection">
+    <h2>Lịch sử đặt vé của bạn</h2>
+
+    {% if lichsu and lichsu|length > 0 %}
+    <div class="ticket-list">
+        {% for v in lichsu %}
+        <div class="ticket-card">
+            <div class="ticket-header">
+                <span class="ticket-id">Mã đặt vé: {{ v.MaDatVe }}</span>
+
+                {% if v.DaHuy == 1 %}
+                    <span class="ticket-status danger">Đã hủy</span>
+                {% elif v.ThanhToan == 'Đã thanh toán' or v.TrangThai == 'Đã thanh toán' %}
+                    <span class="ticket-status success">Đã thanh toán</span>
+                {% else %}
+                    <span class="ticket-status warning">{{ v.TrangThai }}</span>
+                {% endif %}
+            </div>
+
+            <div class="ticket-body">
+                <p><strong>Số ghế:</strong> {{ v.SoGhe if v.SoGhe else "Chưa có" }}</p>
+                <p><strong>Giá vé:</strong> {{ v.GiaVe }} VND</p>
+                <p><strong>Ngày đặt:</strong> {{ v.NgayTao }}</p>
+
+                <div class="ticket-actions">
+                    {% if v.DaHuy == 0 %}
+                        {% if v.ThanhToan != 'Đã thanh toán' %}
+                            <button onclick="thanhToan('{{ v.MaDatVe }}')" class="pay-btn">Thanh toán</button>
+                        {% endif %}
+                        <button onclick="huyVe('{{ v.MaDatVe }}')" class="cancel-btn">Hủy vé</button>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>⚠ Bạn chưa đặt vé nào.</p>
+    {% endif %}
+</section>
+
+<footer class="footer">
+    © 2025 – Hệ thống đặt vé tàu online | Thiết kế bởi Linh Nguyen
+</footer>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

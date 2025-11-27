@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng Nhập / Đăng Ký</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+
+    <div class="auth-box">
+
+        <!-- TAB BUTTONS -->
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="showTab('login')">Đăng nhập</button>
+            <button class="tab-btn" onclick="showTab('register')">Đăng ký</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="login" class="tab-content active">
+
+            <!-- KHUNG HIỂN THỊ THÔNG BÁO -->
+            <div id="login-message" style="margin-bottom:10px; font-size:14px;"></div>
+
+            <form id="login-form">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" required>
+
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required>
+
+                <button class="btn-login" type="submit">Đăng nhập</button>
+            </form>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register" class="tab-content">
+            <form action="/register" method="POST">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" required>
+
+                <label>Email</label>
+                <input type="email" name="email" required>
+
+                <label>Mật khẩu</label>
+                <input type="password" name="password" required>
+
+                <label>Nhập lại mật khẩu</label>
+                <input type="password" name="confirm_password" required>
+
+                <button class="btn-register" type="submit">Đăng ký</button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function showTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(tabDiv => tabDiv.classList.remove('active'));
+
+    event.target.classList.add('active');
+    document.getElementById(tab).classList.add('active');
+}
+
+
+/* ================== HANDLE LOGIN AJAX ================== */
+
+document.getElementById("login-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    const response = await fetch("/login", {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+    const msgBox = document.getElementById("login-message");
+
+    if (result.success) {
+        msgBox.innerHTML = "<span style='color: green;'>✔ " + result.message + " – Đang chuyển trang...</span>";
+
+        setTimeout(() => {
+            window.location.href = "/customer";
+        }, 1500);
+
+    } else {
+        msgBox.innerHTML = "<span style='color: red;'>❌ " + result.message + "</span>";
+    }
+});
+</script>
+
+</body>
+</html>
